@@ -3,8 +3,8 @@ const ListCourses = ({title, courseList}) => {
         <>
            <h4>{title}</h4>
             <ul className="list-group my-5">
-                { courseList.map(course => (
-                     <li className="list-group-item">{course.label}</li>
+                { courseList.map((course, index) => (
+                     <li key={index} className="list-group-item">{course.label}</li>
                     )
                 )}
             </ul>

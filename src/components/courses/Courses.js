@@ -7,10 +7,10 @@ const Courses = () => {
     const title = "Blog of Coding Tech"
 
     const courses = [
-        {id: 1, label: "Spring boot"},
-        {id: 2, label: "ReactJS"},
-        {id: 3, label: "Django"},
-        {id: 4, label: "Laravel"},
+        {id: 1, label: "Spring boot", image:"https://picsum.photos/id/870/200/300?blur=2"},
+        {id: 2},
+        {id: 3, label: "Django", image:"https://picsum.photos/id/872/200/300?blur=2"},
+        {id: 4, label: "Laravel", image:"https://picsum.photos/id/873/200/300?blur=2"},
     ]
 
     return ( 

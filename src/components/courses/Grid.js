@@ -1,6 +1,6 @@
-const Grid = ({course:{ id, label}}) => {
+import PropTypes from 'prop-types'
 
-    const image = "https://picsum.photos/200/300"
+const Grid = ({ id, label, image}) => {
 
     return ( 
         <>
@@ -13,6 +13,17 @@ const Grid = ({course:{ id, label}}) => {
             </div>
         </>
      );
+}
+
+Grid.defaultProps = {
+    label: 'label',
+    image: "https://picsum.photos/id/237/200/300"
+}
+
+Grid.prototype = {
+    id: PropTypes.number.isRequired,
+    label: PropTypes.string,
+    image: PropTypes.string
 }
  
 export default Grid;
