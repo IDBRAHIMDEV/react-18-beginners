@@ -1,11 +1,11 @@
-import Courses from './components/courses/Courses';
+import Users from './components/users/Users';
 import './App.css';
 
 
 function App() {
   return (
     <div className="container">
-      <Courses></Courses>
+      <Users></Users>
     </div>
   );
 }
