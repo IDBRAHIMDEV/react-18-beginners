@@ -1,34 +1,39 @@
 import { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
+import UserCard from './UserCard'
+import Header from '../shared/Header'
+
+import { getApiUrl, transformUsers, loadingSection } from "./user.lib"
 
 function Users() {
 
     const [users, setUsers] = useState([])
+    const [search, setSearch] = useState("")
+    const [loading, setLoading] = useState(false)
 
-    const getAllUser = () => {
+    const runApi = async (apiUrl, search = false) => {
+
+        console.log('search', search)
         
-        fetch("https://api.github.com/users")
-        .then(res => res.json())
-        .then(response => {
-            let newListUsers = []
+        setLoading(true)
 
-            newListUsers = response.map(user => {
-                let myUser = {
-                    id: user.id,
-                    avatar: user.avatar_url,
-                    login: user.login,
-                    url: user.html_url
-                }
-                return myUser
-            })
+        const res = await fetch(apiUrl)
+        const response = await res.json()
+        
+        const data = search ? response.items : response
 
-            setUsers(newListUsers)
-            console.log(newListUsers)
-        })
-        .catch(err => console.log(err))
+        console.log("data", data)
+
+        setTimeout(() => {
+            setLoading(false)
+        }, 1000)
+        
+        return transformUsers(data)
+       
+
     }
 
-    const deleteUser = (id) => {
+    const deleteOne = (id) => {
 
 
         Swal.fire({
@@ -59,9 +64,26 @@ function Users() {
         
     }
 
+    const loadUsers = async () => {
+
+        let apiUrl = getApiUrl(search)
+
+        const data = await runApi(apiUrl, !!search)
+        setUsers(data)
+    }
+
+
+    const listUsers = (
+        users.map(user => (
+                <div key={user.id} className="col-sm-6 col-md-6 col-lg-3 my-2">
+                    <UserCard user={user} deleteUser={ (e) => deleteOne(e)}></UserCard>
+                </div>
+            ))
+    )
+
     useEffect(() => {
         console.log('loading...')
-        getAllUser()
+        loadUsers()
     }, [])
 
   return (
@@ -69,27 +91,29 @@ function Users() {
     <>
 
     <div className="row my-5">
-        <div className="col-md-6"><h1>List of Users</h1></div>
-        <div className="col-md-6 text-end">
-            <input type="search" name="" id="" className="form-control" placeholder="Search" />
-        </div>
+        <Header>
+            <div className="input-group">
+                <input 
+                    type="search" 
+                    className="form-control" 
+                    placeholder="Search" 
+                    onChange={ (e) => setSearch(e.target.value) }
+                    aria-describedby="button-addon2" 
+                />
+                    
+                <button 
+                    onClick={loadUsers} 
+                    className="btn btn-outline-secondary" 
+                    type="button" 
+                    id="button-addon2">
+                         Search
+                </button>
+            </div>
+        </Header>
     </div>
 
     <div className="row my-4">
-        {users.map(user => (
-            <div key={user.id} className="col-md-3 my-2">
-                <div class="card">
-                    <img className="card-img-top" src={user.avatar} alt="Title" />
-                    <div className="card-body">
-                        <h4 className="card-title">{user.login}</h4>
-                        <p className="card-text">
-                            <a className='btn btn-info' href={user.url} target="_blank" rel="noreferrer">Read more...</a>
-                            <button onClick={ () => deleteUser(user.id)} className="btn btn-danger ms-2">Delete</button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        ))}
+        { loading ?  loadingSection : listUsers }
     </div>
 
     </>
