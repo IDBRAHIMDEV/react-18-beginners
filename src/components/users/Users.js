@@ -2,18 +2,27 @@ import { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 
 import { transformData, urlSearchUsers, urlUsers } from './users.lib'
+import Loading from '../shared/Loading'
+import UserCard from './UserCard'
 
 
 function Users() {
 
     const [users, setUsers] = useState([])
     const [search, setSearch] = useState("")
+    const [loading, setLoading] = useState(true)
 
 
     const getUsers = async () => {
         const urlApi = search.trim() ? `${urlSearchUsers}?q=${search}` : urlUsers
+
+        setLoading(true)
         const res = await fetch(urlApi)
         const response = await res.json()
+
+        setTimeout(() => {
+            setLoading(false)
+        }, 2000)
         setUsers(transformData(search.trim() ? response.items : response))
     }
 
@@ -22,7 +31,7 @@ function Users() {
     //     getUsers()
     // }
 
-    const deleteUser = (id) => {
+    const deleteOne = (id) => {
 
 
         Swal.fire({
@@ -73,6 +82,20 @@ function Users() {
         getUsers()
     }, [])
 
+    const loadingComponent = (<Loading>
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </Loading>)
+
+    const listOfUsers = (
+        users.map(user => (
+            <div key={user.id} className="col-md-3 my-2">
+                <UserCard user={user} deleteUser={ (e) => deleteOne(e)}/>
+            </div>
+        ))
+    )
+
   return (
     
     <>
@@ -107,20 +130,7 @@ function Users() {
     </div>
 
     <div className="row my-4">
-        {users.map(user => (
-            <div key={user.id} className="col-md-3 my-2">
-                <div class="card">
-                    <img className="card-img-top" src={user.avatar} alt="Title" />
-                    <div className="card-body">
-                        <h4 className="card-title">{user.login}</h4>
-                        <p className="card-text">
-                            <a className='btn btn-info' href={user.url} target="_blank" rel="noreferrer">Read more...</a>
-                            <button onClick={ () => deleteUser(user.id)} className="btn btn-danger ms-2">Delete</button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        ))}
+        { loading ? (loadingComponent) : listOfUsers}
     </div>
 
     </>
