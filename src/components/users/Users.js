@@ -1,32 +1,26 @@
 import { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 
+import { transformData, urlSearchUsers, urlUsers } from './users.lib'
+
+
 function Users() {
 
     const [users, setUsers] = useState([])
+    const [search, setSearch] = useState("")
 
-    const getAllUser = () => {
-        
-        fetch("https://api.github.com/users")
-        .then(res => res.json())
-        .then(response => {
-            let newListUsers = []
 
-            newListUsers = response.map(user => {
-                let myUser = {
-                    id: user.id,
-                    avatar: user.avatar_url,
-                    login: user.login,
-                    url: user.html_url
-                }
-                return myUser
-            })
-
-            setUsers(newListUsers)
-            console.log(newListUsers)
-        })
-        .catch(err => console.log(err))
+    const getUsers = async () => {
+        const urlApi = search.trim() ? `${urlSearchUsers}?q=${search}` : urlUsers
+        const res = await fetch(urlApi)
+        const response = await res.json()
+        setUsers(transformData(search.trim() ? response.items : response))
     }
+
+    // const getAllUser = () => {
+        
+    //     getUsers()
+    // }
 
     const deleteUser = (id) => {
 
@@ -59,9 +53,24 @@ function Users() {
         
     }
 
+    // const chearchUsers = () => {
+    //     getUsers()
+    // }
+  
+    // load a data from the Api first for loading from a 'api.github.com/users' and a second fron 'api.github.com/search/users' 
+    // const loadUsers = () => {
+
+    //     if(search.trim()) {
+    //         chearchUsers()
+    //     }
+    //     else {
+    //         getAllUser()
+    //     }
+    // }
+
     useEffect(() => {
         console.log('loading...')
-        getAllUser()
+        getUsers()
     }, [])
 
   return (
@@ -71,7 +80,29 @@ function Users() {
     <div className="row my-5">
         <div className="col-md-6"><h1>List of Users</h1></div>
         <div className="col-md-6 text-end">
-            <input type="search" name="" id="" className="form-control" placeholder="Search" />
+
+        <div class="input-group mb-3">
+        <input 
+                aria-describedby="button-addon2"
+                type="search" 
+                name="" 
+                id="" 
+                className="form-control" 
+                placeholder="Search" 
+                onChange={ (e) => setSearch(e.target.value) }
+            />
+
+  <button 
+        class="btn btn-outline-info" 
+        type="button" 
+        id="button-addon2"
+        onClick={getUsers}
+    >
+        Button
+    </button>
+</div>
+
+           
         </div>
     </div>
 
